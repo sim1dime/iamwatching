@@ -1,0 +1,129 @@
+/* author: sim1dime */
+/* --------------------- general elements style ---------------- */
+
+body {
+    margin: 16px;
+    font-family: "Helvetica Neue", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Arial", "Yu Gothic", "Meiryo", sans-serif;
+}
+
+h1 {
+    font-size: 90%;
+    line-height: 1;
+}
+h2 {
+    margin: 0;
+    margin-bottom: 0.5em;
+    line-height: 1;
+}
+
+button {
+    padding: 0.5em;
+    border: none;
+    border-radius: 4px;
+    background-color: dodgerblue;
+    color: white;
+    font-size: 110%;
+}
+button:hover {
+    background-color: deepskyblue;
+}
+button:active {
+    background-color: dodgerblue;
+    box-shadow: inset;
+}
+button:focus {
+    border: solid 1px darkblue
+}
+
+button.is-danger {
+    background-color: orangered;
+}
+button.is-danger:hover {
+    background-color: crimson;
+}
+button.is-danger:active {
+    background-color: orangered;
+}
+button.is-danger:disabled {
+    background-color: lightgray;
+    color: darkgray;
+}
+
+
+input,select,textarea {
+    border-radius: 4px;
+    border: solid 1px navy;
+    font-family: "Helvetica Neue", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Arial", "Yu Gothic", "Meiryo", sans-serif;
+    font-size: 110%;
+}
+label {
+    margin-left: 1em;
+    font-weight: bold;
+}
+
+/* --------------------- class style ---------------- */
+
+#app {
+    margin: 0;
+    padding: 0;
+}
+
+.titlebar {
+    display: flex;
+    justify-content: space-between;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    padding-left: 1em;
+    padding-right: 1em;
+    background-color: mediumslateblue;
+    color: white;
+}
+.titlebar .title {
+    font-size: xx-large;
+    font-weight: bold;
+}
+.titlebar .buttons {
+    display: flex;
+    column-gap: 4px;
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+.configuration {
+    margin-top: 0;
+    margin-bottom: 1em;
+    padding: 1em;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    background-color: lavender;
+}
+.is-expanded {
+    height:auto;
+}
+.is-expanded * {
+    visibility: visible;
+}
+.is-shurinked {
+    height: 0.5em;
+ }
+ /* 縦幅を狭くしただけだと中身が見えてしまうのでdiv単位でhiddenにする。 */
+.is-shurinked * {
+    visibility: hidden;
+}
+
+.configuration .general-configuration {
+    display: flex;
+    margin-bottom: 0.5em;
+}
+.configuration .target-configuration {
+    display: flex;
+    padding-top: 0.5em;
+    column-gap: 1em;
+    border-top: solid 1px mediumslateblue;
+}
+.configuration .target-configuration label {
+    align-self: flex-start;
+}
+.configuration .target-configuration button {
+    align-self: flex-end;
+}

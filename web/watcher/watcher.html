@@ -1,0 +1,80 @@
+<!doctype html>
+
+<html lang='ja'>
+<head>
+  <meta charset='utf-8'>
+
+  <title>監視対象画面一覧</title>
+  <meta name='description' content='監視画面です。'>
+  <meta name='author' content='sim1dime'>
+  <link rel='stylesheet' href='watcher.css'>
+  <link rel='stylesheet' href='target-screen.css'>
+  <script src="https://unpkg.com/vue@next"></script>
+  <!-- 
+    上のscript要素について、このHTMLがインターネットにつながらない環境で使うときはVue.js（Vue3）のCDN版を
+    入手して次のように直接ローカルで参照する。
+    <script src="vue.global.prod.js"></script>
+   -->
+</head>
+
+<body>
+  <div id='app'>
+    <div id="title-and-buttons" class='titlebar'>
+      <div class="title">
+        <h1>監視対象画面一覧</h1>
+      </div>
+      <div class="buttons">
+        <button id='button-start-watching' class='form-field is-danger' @click='startWatching'>監視開始</button>
+        <button id='button-stop-watching' class='form-field' @click='stopWatching'>監視停止</button>
+        <button class='form-field' @click='toggleConfigurationVisibility'>設定画面表示・非表示</button>
+      </div>
+    </div>
+    <div id='configuration-panel' class='configuration' :class='{"is-expanded": showConfiguration, "is-shurinked": !showConfiguration}'>
+      <h2>設定</h2>
+      <p>ポート番号は変更後Enterキーですぐ反映されます。更新間隔は一度監視を停止して再度開始する際に反映されます。</p>
+      <div class='general-configuration'>
+        <label for='image-width'>画像サイズ:
+          <select name='image-width' id='image-width' class='form-field' v-model='screenImageWidth'>
+            <option value='240'>極小（240px）</option>
+            <option value='320'>小（320px）</option>
+            <option value='400'>中（400px）</option>
+            <option value='600'>大（600px）</option>
+            <option value='1280'>最大（1280px）</option>
+          </select>
+        </label>
+        <label for='interval'>画面更新間隔（秒）:
+          <input class='form-field' type='text' id='interval' pattern='[0-9]{1,3}' v-model='refreshInterval'>
+        </label>
+        <!-- ポート番号は編集中に毎回反映されると大変なので、Enterで確定したらにする。 -->
+        <label for='port-number'>ポート番号:
+          <input class='form-field' type='text' id='port-number' ref='portNumber' v-bind:value='portNumber' v-on:keyup.enter='applyPortNumber'>
+        </label>
+      </div>
+      <div class='target-configuration'>
+        <label for='target-csv'>監視対象指定リスト<a href='csvhelp.html' target='_blank'>（指定リストのヘルプ）</a>:        </label>
+        <textarea class='form-field' id='target-csv' rows='10' cols='40' placeholder='IPアドレス,ホスト名（任意）,コメント（任意）を指定してください。&#13;&#10;例：&#13;&#10;192.168.0.1,host1,山田太郎さん&#13;&#10;192.168.0.10,host20,予備機'></textarea>
+        <button class='form-field' name='apply-targets' id='apply-targets' @click='applyTargetCsv'>リスト反映</button>
+      </div>
+    </div>
+
+    <!-- ここからtarget-screenコンポーネントを使って、監視対象の数だけ繰り返して画面を表示する -->
+    <div class='screen-list'>
+      <p v-if='targets.length == 0'>監視対象がありません。設定画面で監視対象リストを入力し反映してください。</p>
+      <!--:widthについては、t.width だけだと型不一致警告が出る。あとここはケバブケースで指定する。 -->
+      <target-screen 
+        v-for='t in targets'
+        :key='t.id'
+        :ipv4-address='t.ipv4Address'
+        :image-url='t.imageUrl'
+        :width='Number(t.width)'
+        :hostname='t.hostname'
+        :comment='t.comment'
+        :count='t.count'
+        @screen-double-click='showSingleScreen'
+      ></target-screen>
+    </div>
+  </div> 
+  <!--Vueのアプリケーションが適切に要素をマウントするためには最後に呼び出す。 -->
+  <script src='watcher.js'></script>
+</body>
+</html>
