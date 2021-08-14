@@ -56,6 +56,9 @@ input,select,textarea {
     font-family: "Helvetica Neue", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Arial", "Yu Gothic", "Meiryo", sans-serif;
     font-size: 110%;
 }
+input:out-of-range {
+    background-color: pink;
+}
 label {
     margin-left: 1em;
     font-weight: bold;

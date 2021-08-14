@@ -43,16 +43,18 @@
           </select>
         </label>
         <label for='interval'>画面更新間隔（秒）:
-          <input class='form-field' type='text' id='interval' pattern='[0-9]{1,3}' v-model='refreshInterval'>
+          <input class='form-field' type='number' id='interval' min='1' max='300' v-model='refreshInterval'>
         </label>
         <!-- ポート番号は編集中に毎回反映されると大変なので、Enterで確定したらにする。 -->
         <label for='port-number'>ポート番号:
-          <input class='form-field' type='text' id='port-number' ref='portNumber' v-bind:value='portNumber' v-on:keyup.enter='applyPortNumber'>
+          <input class='form-field' type='number' id='port-number' min='1' max='65535' ref='portNumber' v-bind:value='portNumber' v-on:keyup.enter='applyPortNumber'>
         </label>
       </div>
       <div class='target-configuration'>
-        <label for='target-csv'>監視対象指定リスト<a href='csvhelp.html' target='_blank'>（指定リストのヘルプ）</a>:        </label>
-        <textarea class='form-field' id='target-csv' rows='10' cols='40' placeholder='IPアドレス,ホスト名（任意）,コメント（任意）を指定してください。&#13;&#10;例：&#13;&#10;192.168.0.1,host1,山田太郎さん&#13;&#10;192.168.0.10,host20,予備機'></textarea>
+        <label for='target-csv'>監視対象指定リスト<a href='list-help.html' target='_blank'>（指定リストのヘルプ）</a>:        </label>
+        <textarea class='form-field' id='target-csv' rows='10' cols='40'
+          placeholder='監視対象1台ごとに1行で「<ホスト名・IPアドレス>,<コメント>」を記述してください。
+          &#13;&#10;例：&#13;&#10;192.168.0.1,山田太郎さん操作&#13;&#10;Host10,予備マシン'></textarea>
         <button class='form-field' name='apply-targets' id='apply-targets' @click='applyTargetCsv'>リスト反映</button>
       </div>
     </div>
