@@ -86,17 +86,16 @@ const Watcher = {
         let newTargets = [];
         for (let i = 0; i < rows.length; i++) {
             const cols = rows[i].split(',');
-            // カンマで分割して3列なければ飛ばす。1列目が空でも飛ばす。
-            if ((cols.length < 3) || (cols[0].length == 0)) {
+            // カンマで分割して2列なければ飛ばす。1列目が空でも飛ばす。
+            if ((cols.length < 2) || (cols[0].length == 0)) {
                 continue;
             }
             // v-forのkeyに使うためこのループのカウンタをidにする。
-            let target = {id: i, ipv4Address: '', imageUrl: '', width: 1, hostname: '', comment: '', count: 0};
-            target.ipv4Address = cols[0].trim();
-            target.hostname = cols[1].trim();
-            target.comment = cols[2].trim();
+            let target = {id: i, host: '', imageUrl: '', width: 1, comment: '', count: 0};
+            target.host = cols[0].trim();
+            target.comment = cols[1].trim();
             target.width = width;
-            target.imageUrl = this.getScreenImageUrl(target.ipv4Address, port, width);
+            target.imageUrl = this.getScreenImageUrl(target.host, port, width);
             newTargets.push(target);
         }
         this.targets = newTargets;
@@ -106,14 +105,31 @@ const Watcher = {
     showSingleScreen(target) {
         // 引数の target はコンポーネントが親からもらったものと同じ名前で同じ値を詰めなおしたもの。
         
-        // このページのhash（#）以降のフラグメント識別子を削除したURLを取得し、新しいフラグメント識別子を追加する。
-        const fragment = "#single-" + target.ipv4Address + "-" + this.portNumber + "-" + this.refreshInterval;
+        // このページのhash（#）以降のフラグメントを削除したURLを取得し、新しいフラグメント識別子を追加する。
+        const fragment = "#single-" + this.refreshInterval + "-" + this.portNumber + "-" + target.host ;
         const newUrl = window.location.toString().replace(window.location.hash, '').concat(fragment);
         window.open(newUrl, '_blank');
     },
     // 与えられたIPv4アドレス、ポート番号、画像幅を使って監視対象から画像を取得するURLを返します。
-    getScreenImageUrl(ipv4Address, portNumber, width) {
-        return "http://" + ipv4Address + ":" + portNumber + "/screenjpeg?width=" + width;
+    getScreenImageUrl(host, portNumber, width) {
+        return "http://" + host + ":" + portNumber + "/screenjpeg?width=" + width;
+    },
+    // 監視画面ページのURLのフラグメントを分解してホスト名、ポート番号、インターバルを取得して返す。取れなければnullを返す。
+    getParameterFromFragment(fragment) {
+        // match()はグローバルフラグ（g）のない正規表現で一致全体とキャプチャグループをArrayで返す。
+        const matches = fragment.match(/^#single-(\d+)-(\d+)-(.+)$/);
+        console.log(matches);
+        // うまくとれていれば、元文字列、更新間隔、ポート番号、ホストで長さ4配列。
+        if (matches.length != 4) {
+            return null;
+        }
+        const param = {
+               host: matches[3],
+               portNumber: matches[2],
+               interval: matches[1]
+        };
+        console.log(param);
+        return param;
     }
   },
   watch: {
@@ -123,7 +139,7 @@ const Watcher = {
           const self = this;
           let newTargets = this.targets.map(function(t){
               // 変更が必要なのはURLと監視画面幅
-              t.imageUrl = self.getScreenImageUrl(t.ipv4Address, self.portNumber, newWidth);
+              t.imageUrl = self.getScreenImageUrl(t.host, self.portNumber, newWidth);
               t.width = newWidth;
               return t;
           });
@@ -136,7 +152,7 @@ const Watcher = {
         const self = this;
         let newTargets = this.targets.map(function(t){
               // 変更が必要なのはURLのみ
-              t.imageUrl = self.getScreenImageUrl(t.ipv4Address, newPortNumber, t.width);
+              t.imageUrl = self.getScreenImageUrl(t.host, newPortNumber, t.width);
               return t;
           });
           // 最後に一括差し替え
@@ -147,35 +163,34 @@ const Watcher = {
     // マウント完了時に、URL（用途からするとローカルファイルパス）のhash指定があれば
     // その指定内容から自動的に１台分の監視設定を行う。あと最大画面表示想定なのでいったん設定画面はたたむ。
     // 想定される形式は以下
-    // file://path/to/watcher.html#single-<IPv4 Address>-<Port Number>-<Interval>
+    // file://path/to/watcher.html#single-<Interval>-<Port Number>-<Host>
     // ホスト名やコメントは含まない想定なので、手動で追加が必要。
     let hashString = window.location.hash;
     if (hashString.length == 0) {
         return;
     }
-    let params = hashString.split('-');
-    if ((params[0] != '#single') && (params.length > 3)) {
+    let param = this.getParameterFromFragment(hashString);
+    if (param === null) {
         return;
     }
     // 想定にあったhash指定だったのでこれをもとに監視設定を行う。画面幅は最大の1280px。
     const width = 1280;
     this.screenImageWidth = width;
-    this.portNumber = params[2];
-    this.refreshInterval = params[3];
+    this.portNumber = param.portNumber;
+    this.refreshInterval = param.interval;
     const newTargets = [
         {
            id: 0,
-           ipv4Address: params[1],
-           imageUrl: this.getScreenImageUrl(params[1], params[2], width),
+           host: param.host,
+           imageUrl: this.getScreenImageUrl(param.host, param.portNumber, width),
            width: width,
-           hostname: '',
            comment: '',
            count: 0
         }
     ];
     this.targets = newTargets;
     // 監視対象コメントにも一言追加しておく。ただこれは何かバインディングしている値ではないので実際は「リスト反映」が必要。
-    window.document.querySelector('#target-csv').value = params[1] + ',,自動設定1台監視';
+    window.document.querySelector('#target-csv').value = param.host + ',自動設定1台監視';
     // 1台表示として開始する場合は設定画面非表示を初期設定とする。
     this.showConfiguration = false;
   },
@@ -188,10 +203,9 @@ const app = Vue.createApp(Watcher)
 // 監視画面マシン1台分のコンポーネント
 app.component('target-screen', {
     props: {
-      ipv4Address: String,
+      host: String,
       imageUrl: String,
       width: Number,      // Validatorつけたい
-      hostname: String,
       comment: String,
       count: Number
     },
@@ -215,10 +229,9 @@ app.component('target-screen', {
         screenDoubleClick() {
             const target = {
                     id: -1, // これはpropsでもらっておらずわからないため-1にする。-1という値に意味はない。
-                    ipv4Address: String(this.ipv4Address),
+                    host: String(this.host),
                     imageUrl: this.screenImageUrlWithCount,
                     width: this.width,
-                    hostname: String(this.hostname),
                     comment: String(this.comment),
                     count: 0 
             }
@@ -240,10 +253,7 @@ app.component('target-screen', {
         },
         // 各監視画面上部に表示するIPアドレス等について、内容をチェックしてあるものだけ返す。
         screenName() {
-            let name = this.ipv4Address;
-            if (this.hostname != null && this.hostname.length > 0) {
-                name = name + " | " + this.hostname;
-            }
+            let name = this.host;
             if (this.comment != null && this.comment.length > 0) {
                 name = name + " | " + this.comment;
             }

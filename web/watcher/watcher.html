@@ -64,10 +64,9 @@
       <target-screen 
         v-for='t in targets'
         :key='t.id'
-        :ipv4-address='t.ipv4Address'
+        :host='t.host'
         :image-url='t.imageUrl'
         :width='Number(t.width)'
-        :hostname='t.hostname'
         :comment='t.comment'
         :count='t.count'
         @screen-double-click='showSingleScreen'
