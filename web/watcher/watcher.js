@@ -211,7 +211,6 @@ app.component('target-screen', {
     },
     template: `
       <div class='target-screen' :style='newScreenImageWidth'>
-        <img class='screen-image' :src='screenImageUrlWithCount' @dblclick='screenDoubleClick'>
         <div class='header'>
           <p class='hostname'>{{screenName}}</p>
           <p class='close-button'><!-- ikonate.comのSVGアイコン利用 -->
@@ -221,6 +220,7 @@ app.component('target-screen', {
             </svg>
           </p>
         </div>
+        <img class='screen-image' :src='screenImageUrlWithCount' @dblclick='screenDoubleClick'>
         <p class='no-image-message'>表示できる画像がありません。</p>
       </div>
     `,
