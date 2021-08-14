@@ -13,23 +13,18 @@
     display: inline-block;
     --screen-width: 240px;
     width: var(--screen-width);
-    /* 監視対象画面は16:9ディスプレイを想定 */
-    height: calc(var(--screen-width) * 9 / 16);
+    /* 監視対象画面は16:9ディスプレイを想定して縦幅を計算する。また+1emはタイトル表示をちょっとずらす余地を確保するため。 */
+    height: calc(var(--screen-width) * 9 / 16 + 1em);
     margin: 4px;
+    padding: 0;
     background-image: none;
     background-color: dimgrey;
     color: white;
 }
-.screen-list .target-screen .screen-image {
-    position: relative;
-    top: 1em;
-    left: 0px;
-    width: var(--screen-width);
-    /* heightはwidthだけ指定すればきっと自動的にあってくれるはず…… */
-}
 
 .screen-list .target-screen .header {
     position: absolute;
+    z-index: 30;
     top: 0px;
     left: 0px;
     width: 100%;
@@ -48,16 +43,20 @@
 
 .screen-list .target-screen .header .hostname {
     display: inline-block;
-    align-self: start;
+    align-self: center;
     margin: 0;
-    margin-left: 0.5em;
+    padding-left: 0.5em;
     opacity: 1;
     font-weight: bold;
 }
+
+/* 監視対象画面ごとの右上×ボタンを作っていたがいったん非表示にする。 */
 .screen-list .target-screen .header .close-button {
+    visibility: hidden;
     display: inline-block;
+    align-self: center;
     margin: 0;
-    margin-right: 4px;
+    padding-right: 4px;
     line-height: 0.9;
     opacity: 1;
 }
@@ -69,11 +68,8 @@
     border: solid 2px white;
 }
 
-.close-button img {
-    margin: 0;
-}
 /* 
-  ikonate.comで生成、ダウンロードした「×」アイコン用インラインSVGのスタイル設定。
+  ikonate.comで生成、ダウンロードした「×」アイコン用インラインSVGに当初から設定されているスタイル設定。
 */
 .close-button svg {
     width: 24px;
@@ -84,4 +80,21 @@
     stroke-linejoin: miter;
     fill: none;
     color: #ffffff;
+}
+
+.screen-list .target-screen .screen-image {
+    position: absolute;
+    z-index: 20;
+    top: 1em;
+    left: 0px;
+    width: var(--screen-width);
+    /* heightはwidthだけ指定すれば親divに合わせて自動的にあってくれるはず…… */
+}
+
+.screen-list .no-image-message {
+    position: relative;
+    z-index: 10;
+    top: 45%;
+    margin: auto;
+    text-align: center;
 }
