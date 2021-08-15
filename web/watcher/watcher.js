@@ -6,6 +6,7 @@ const Watcher = {
   data() {
       return {
           screenImageWidth: 320,    // 一覧での画面サイズ
+          aspectRatio: '16:9',      // 一覧での画面比率
           refreshInterval: 5,       // 画面更新間隔
           portNumber: 3400,         // 各監視対象と通信するポート番号
           targets: [],              // 監視対象画面一覧の各画面に必要な情報の配列
@@ -132,6 +133,23 @@ const Watcher = {
         return param;
     }
   },
+  computed: {
+      // 監視画面幅とアスペクト比設定から、縦幅を計算する。アスペクト比が未知のものの場合は1:1とする。
+      calculatedImageHeight() {
+        let ratiomap = new Map();
+        ratiomap.set('16:9', 9.0/16.0);
+        ratiomap.set('4:3', 3.0/4.0);
+        ratiomap.set('5:4', 4.0/5.0);
+        
+        if (ratiomap.has(this.aspectRatio)) {
+            return Math.round(this.screenImageWidth * ratiomap.get(this.aspectRatio));
+        }
+        else {
+            return this.width * 1;
+        }
+
+      }
+  },
   watch: {
       // 監視画面サイズ設定が変わった場合、各監視対象画面のプロパティを変える必要があるためwatchする
       screenImageWidth(newWidth, oldWidth) {
@@ -206,11 +224,12 @@ app.component('target-screen', {
       host: String,
       imageUrl: String,
       width: Number,      // Validatorつけたい
+      height: Number,
       comment: String,
       count: Number
     },
     template: `
-      <div class='target-screen' :style='newScreenImageWidth'>
+      <div class='target-screen' :style='newScreenImageSize'>
         <div class='header'>
           <p class='hostname'>{{screenName}}</p>
           <p class='close-button'><!-- ikonate.comのSVGアイコン利用 -->
@@ -239,11 +258,12 @@ app.component('target-screen', {
         }
     },
     computed: {
-        // 指定されたwidthによる新しいスタイル設定を返す。
-        newScreenImageWidth() {
+        // 指定されたwidth,heightによる新しいスタイル設定を返す。
+        newScreenImageSize() {
             // target-screenで定義しているCSS変数を上書きすることで内部の要素をまとめてサイズ変更する
             // このため、target-screenテンプレートのCSSでは必ず --screen-width 変数を定義しておくこと。
-            return ("--screen-width: " + this.width + "px;");
+            console.log(this.width + "x" + this.height);
+            return ("--screen-width: " + this.width + "px; --screen-height: " + this.height + "px;");
         },
         // 自動更新のためのカウントを追加したURLの作成
         screenImageUrlWithCount() {

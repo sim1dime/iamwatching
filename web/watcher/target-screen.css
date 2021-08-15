@@ -11,15 +11,16 @@
 .screen-list .target-screen {
     position: relative;
     display: inline-block;
-    --screen-width: 240px;
+    --screen-width: 320px;
+    --screen-height: 180px;
     width: var(--screen-width);
-    /* 監視対象画面は16:9ディスプレイを想定して縦幅を計算する。また+1emはタイトル表示をちょっとずらす余地を確保するため。 */
-    height: calc(var(--screen-width) * 9 / 16 + 1em);
+    height: calc(var(--screen-height) + 1em);
     margin: 4px;
     padding: 0;
     background-image: none;
     background-color: dimgrey;
     color: white;
+    overflow: hidden;
 }
 
 .screen-list .target-screen .header {
