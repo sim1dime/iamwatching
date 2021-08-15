@@ -31,7 +31,8 @@
     </div>
     <div id='configuration-panel' class='configuration' :class='{"is-expanded": showConfiguration, "is-shurinked": !showConfiguration}'>
       <h2>設定</h2>
-      <p>ポート番号は変更後Enterキーですぐ反映されます。更新間隔は一度監視を停止して再度開始する際に反映されます。</p>
+      <p>画像サイズとアスペクト比はすべての画面での共通設定です。異なるアスペクト比の画面では画面下部が見えなくなる可能性があります。
+        ポート番号は変更後Enterキーですぐ反映されます。更新間隔は一度監視を停止して再度開始する際に反映されます。</p>
       <div class='general-configuration'>
         <label for='image-width'>画像サイズ:
           <select name='image-width' id='image-width' class='form-field' v-model='screenImageWidth'>
@@ -40,6 +41,13 @@
             <option value='400'>中（400px）</option>
             <option value='600'>大（600px）</option>
             <option value='1280'>最大（1280px）</option>
+          </select>
+        </label>
+        <label for='aspect-ratio'>画像アスペクト比:
+          <select name='aspect-ratio' id='aspect-ratio' class='form-field' v-model='aspectRatio'>
+            <option value='16:9'>16:9</option>
+            <option value='4:3'>4:3</option>
+            <option value='5:4'>5:4</option>
           </select>
         </label>
         <label for='interval'>画面更新間隔（秒）:
@@ -69,6 +77,7 @@
         :host='t.host'
         :image-url='t.imageUrl'
         :width='Number(t.width)'
+        :height='calculatedImageHeight'
         :comment='t.comment'
         :count='t.count'
         @screen-double-click='showSingleScreen'
