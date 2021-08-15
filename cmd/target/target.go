@@ -32,7 +32,12 @@ func getScreenJPEG(w http.ResponseWriter, r *http.Request) {
 	// パラメーターチェックが終わったので0番目のキャプチャ画像を取得
 	img, err := getScreenZero(width)
 	if err != nil {
-		panic(err)
+		// 画像取得でエラーがあった場合は503を返す。
+		// たとえばEC2 WindowsインスタンスにRDP接続していないときはscreenshot.CaptureRect()でBitBltが失敗してここにくる
+		log.Printf("Error occured in screen capture: %s", err)
+		w.WriteHeader(http.StatusServiceUnavailable)
+		// panic(err)
+		return
 	}
 
 	// 最後にJPEG圧縮してクライアントに返す。Encode()はioWriterに流すのでhttp.ResponseWriterそのまま渡せる。
@@ -59,6 +64,11 @@ func getScreenZero(width int) (img *image.RGBA, err error) {
 // getScreen()は指定されたディスプレイ番号の画面全体をキャプチャして、画像を返します。
 func getScreen(i int, width int) (img *image.RGBA, err error) {
 	number := screenshot.NumActiveDisplays()
+	if number == 0 {
+		// アクティブなディスプレイが0個＝ディスプレイが接続されていない
+		err = fmt.Errorf("no display exisits.")
+		return
+	}
 	if i > (number - 1) {
 		// 最大ディスプレイ番号より大きい値を指定したのでエラー
 		err = fmt.Errorf("The specified display number %d does not exists.", i)
@@ -67,6 +77,9 @@ func getScreen(i int, width int) (img *image.RGBA, err error) {
 	// ここでは縦横サイズが必要なためまずGetDisplayBoundsしてからキャプチャ。
 	bounds := screenshot.GetDisplayBounds(i)
 	img, err = screenshot.CaptureRect(bounds)
+	if err != nil {
+		return
+	}
 
 	// 必要に応じ拡大・縮小変換する。
 	// 横幅優先で、指定された変換後の画像幅が0以下の場合はサイズ無変換で返す（0以下をエラーにするのは呼び出し側の責任）。
@@ -109,9 +122,9 @@ func main() {
 	// ポート番号を実行時引数で受け取る。デフォルトは3400。
 	port := flag.Int("port", 3400, "監視側サーバーからの通信を待ち受けるポート番号です。")
 	flag.Parse()
-	// 負の値やwell-knownポート番号を指定していないか、65535より大きい値を指定していないかチェック
-	if *port < 1024 || *port > 65535 {
-		fmt.Println("ポート番号は1024～65535の間で指定してください。本プログラムを終了します。")
+	// 負値や65535より大きい値を指定していないかチェック
+	if *port < 0 || *port > 65535 {
+		fmt.Println("ポート番号は0～65535の間で指定してください。本プログラムを終了します。")
 		os.Exit(1)
 	}
 	portString := fmt.Sprintf(":%d", *port)
