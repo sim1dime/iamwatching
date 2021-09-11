@@ -71,6 +71,7 @@ label {
     padding: 0;
 }
 
+/* ---- タイトルバー ----*/
 .titlebar {
     display: flex;
     justify-content: space-between;
@@ -92,7 +93,8 @@ label {
     margin-bottom: auto;
 }
 
-.configuration {
+/* ---- 設定画面 ---- */
+#configuration-panel {
     margin-top: 0;
     margin-bottom: 1em;
     padding: 1em;
@@ -114,19 +116,42 @@ label {
     visibility: hidden;
 }
 
-.configuration .general-configuration {
+/* ---- 監視画面共通設定 ---- */
+#general-configuration {
     display: flex;
     margin-bottom: 0.5em;
 }
-.configuration .target-configuration {
+/* ---- 監視対象リスト設定 ---- */
+#target-configuration {
     display: flex;
     padding-top: 0.5em;
     column-gap: 1em;
     border-top: solid 1px mediumslateblue;
 }
-.configuration .target-configuration label {
+#target-configuration label {
     align-self: flex-start;
 }
-.configuration .target-configuration button {
+#target-configuration button {
     align-self: flex-end;
+}
+
+
+
+/* インラインで使用しているikonate.comの拡大・縮小アイコン用スタイル */
+#configuration-panel svg {
+    margin: 0;
+    height: 1.5em;
+    stroke: #000000;
+    stroke-width: 1.5;
+    stroke-linecap: square;
+    stroke-linejoin: miter;
+    fill: none;
+    color: #000000;
+}
+
+#configuration-panel svg:hover {
+    border: solid 2px black;
+}
+#configuration-panel svg:active {
+    border: solid 2px orangered;
 }
