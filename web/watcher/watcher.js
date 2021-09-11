@@ -131,6 +131,17 @@ const Watcher = {
         };
         console.log(param);
         return param;
+    },
+    // 監視対象画面を1段階拡大または縮小する
+    changeTargetScreenSizeOneStep(isEnlarge) {
+    },
+    // 監視対象画面を1段階拡大する
+    enlargeTargetScreenSizeOneStep() {
+        this.changeTargetScreenSizeOneStep(true);
+    },
+    // 監視対象画面を1段階縮小する
+    reduceTargetScreenSizeOneStep() {
+        this.changeTargetScreenSizeOneStep(false);
     }
   },
   computed: {
