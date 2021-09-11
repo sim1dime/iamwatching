@@ -35,15 +35,15 @@
         ポート番号は変更後Enterキーですぐ反映されます。更新間隔は一度監視を停止して再度開始する際に反映されます。</p>
       <div id='general-configuration'>
         <div id='zoom-in-zoom-out'>
-        <label for='image-width'>画像サイズ:
-          <select name='image-width' id='image-width' class='form-field' v-model='screenImageWidth'>
-            <option value='240'>極小（240px）</option>
-            <option value='320'>小（320px）</option>
-            <option value='400'>中（400px）</option>
-            <option value='600'>大（600px）</option>
-            <option value='1280'>最大（1280px）</option>
-          </select>
-        </label>
+          <label for='image-width'>画像サイズ:
+            <select name='image-width' id='image-width' class='form-field' v-model='screenImageWidth'>
+              <option value='240'>極小（240px）</option>
+              <option value='320'>小（320px）</option>
+              <option value='400'>中（400px）</option>
+              <option value='600'>大（600px）</option>
+              <option value='1280'>最大（1280px）</option>
+            </select>
+          </label>
           <svg role="img" xmlns="http://www.w3.org/2000/svg" width="24" height="24" 
           viewBox="0 0 24 24" aria-labelledby="zoomInIconTitle" v-on:click='enlargeTargetScreenSizeOneStep()'>
             <title id="zoomInIconTitle">拡大</title>

@@ -121,6 +121,9 @@ label {
     display: flex;
     margin-bottom: 0.5em;
 }
+#zoom-in-zoom-out {
+    display: flex;
+}
 /* ---- 監視対象リスト設定 ---- */
 #target-configuration {
     display: flex;
