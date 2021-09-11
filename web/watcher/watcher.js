@@ -134,6 +134,15 @@ const Watcher = {
     },
     // 監視対象画面を1段階拡大または縮小する
     changeTargetScreenSizeOneStep(isEnlarge) {
+        let s = document.querySelector('#image-width');
+        let i = s.selectedIndex;
+
+        if (isEnlarge && i < s.options.length - 1) {
+            this.screenImageWidth = s.options[i + 1].value;
+        }
+        else if (!isEnlarge && i > 0) {
+            this.screenImageWidth = s.options[i - 1].value;
+        }
     },
     // 監視対象画面を1段階拡大する
     enlargeTargetScreenSizeOneStep() {
