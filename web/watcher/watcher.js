@@ -79,28 +79,34 @@ const Watcher = {
         if (csv.length == 0) {
             return null;
         }
-        // 想定フォーマット: 区切り文字はカンマ固定、ダブルクオートで値を囲まない、列は左端からIPv4アドレス、ホスト名、コメント
-        // 特に検証せず実績あるライブラリ等も使わずパースするため入力に注意してほしい……。
+        // 行の分割と、画像URL生成に必要なデータの取得
         const rows = csv.split(/\r?\n/);
         const port = this.portNumber;
         const width = this.screenImageWidth;
         let newTargets = [];
         for (let i = 0; i < rows.length; i++) {
-            const cols = rows[i].split(',');
-            // カンマで分割して2列なければ飛ばす。1列目が空でも飛ばす。
-            if ((cols.length < 2) || (cols[0].length == 0)) {
+            // match()はグローバルフラグ（g）のない正規表現で一致全体とキャプチャグループをArrayで返す。
+            // 戻り値は、rows[i]の1行分全体と、カンマおよびタブが初めて登場するまでと、それ以降の3要素配列。
+            // カンマやタブで終わったりカンマやタブがなかったら、最後の要素は長さ0文字列になる。
+            const matches = rows[i].match(/^([^,\t]+)[,\t]?(.*)$/);
+            // 最終行などが空行で長さ0文字列の場合は戻り値がnullになるため、その行は処理せず次の行へ進む。
+            if (matches == null) {
+                continue;
+            }
+            // IPアドレスまたはホストの指定がなければその行は処理せず次の行へ進む。
+            const host = matches[1].trim();
+            if (host.length == 0) {
                 continue;
             }
             // v-forのkeyに使うためこのループのカウンタをidにする。
-            let target = {id: i, host: '', imageUrl: '', width: 1, comment: '', count: 0};
-            target.host = cols[0].trim();
-            target.comment = cols[1].trim();
-            target.width = width;
+            let target = {id: i, host: '', imageUrl: '', width: width, comment: '', count: 0};
+            target.host = host;
+            target.comment = matches[2].trim();
             target.imageUrl = this.getScreenImageUrl(target.host, port, width);
             newTargets.push(target);
         }
         this.targets = newTargets;
-        //return newTargets;
+
     },
     // 各監視画面の画像ダブルクリック時に実行され、その監視画面だけを指定した本アプリHTMLファイルを別ウィンドウで開きます。
     showSingleScreen(target) {
