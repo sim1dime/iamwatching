@@ -34,11 +34,13 @@ const Watcher = {
     },
     // refreshAllScreenImage は呼び出されるとすべての監視画面を一度更新します。
     refreshAllScreenImage() {
+        const now = Math.round(Date.now() / 1000);
         // 監視対象の変数を配列の順序で直接変更したいのでforループが良いはず。
         for (let i = 0; i < this.targets.length; i++) {
             // 100ミリ秒ずつ待って実行する（このため監視数によっては監視間隔超えるかも）
             setTimeout(function(){}, 100);
-            this.targets[i].count++;
+            // countは以前単純に0からインクリメントしていたけど、URLにつけてキャッシュを取ってこさせない目的なので現在時刻秒にする
+            this.targets[i].count = now;
         }
     },
     // startWatching は各監視画面を取得・更新する繰り返し処理を開始します。
