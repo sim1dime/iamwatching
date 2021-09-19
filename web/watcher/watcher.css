@@ -134,6 +134,12 @@ label {
     column-gap: 1em;
     border-top: solid 1px mediumslateblue;
 }
+#target-configuration :first-child {
+    max-width: 40%;
+}
+#target-configuration p {
+    margin-left: 16px;
+}
 #target-configuration label {
     align-self: flex-start;
 }

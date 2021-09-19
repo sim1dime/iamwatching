@@ -212,6 +212,16 @@ const Watcher = {
       }
   },
   mounted: function() {
+      
+    // ページ離脱時に監視対象リストの保存せずに終了してよいかどうかを確認するよう設定する。
+    // ただしこのあとの1画面表示の場合は確認せず閉じるようにする。
+    let preventUnload = function(e) {
+        e.preventDefault();
+        // Chromium系やFirefoxではメッセージが出ないがnullやundefined以外が必要なので一応追加する。
+        e.returnValue = "監視対象リストの内容は失われます。クリップボードにコピーして保存してください。";
+    }
+    window.addEventListener("beforeunload", preventUnload);
+
     // マウント完了時に、URL（用途からするとローカルファイルパス）のhash指定があれば
     // その指定内容から自動的に１台分の監視設定を行う。あと最大画面表示想定なのでいったん設定画面はたたむ。
     // 想定される形式は以下
@@ -245,6 +255,8 @@ const Watcher = {
     window.document.querySelector('#target-csv').value = param.host + ',自動設定1台監視';
     // 1台表示として開始する場合は設定画面非表示を初期設定とする。
     this.showConfiguration = false;
+    // 終了時に確認しないようにする。
+    window.removeEventListener("beforeunload", preventUnload);
   },
   destroyed: function() {
     // destroyされるときはもう使わないから空でOK（なはず……）

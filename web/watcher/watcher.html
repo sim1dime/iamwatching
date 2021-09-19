@@ -75,7 +75,10 @@
         </label>
       </div>
       <div id='target-configuration'>
-        <label for='target-csv'>監視対象指定リスト<a href='list-help.html' target='_blank'>（指定リストのヘルプ）</a>:        </label>
+        <div>
+          <label for='target-csv'>監視対象指定リスト<a href='list-help.html' target='_blank'>（指定リストのヘルプ）</a>: </label>
+          <p>監視対象リストの内容はページをリロード・更新すると失われます。リスト内容を後日使用したい場合は、更新したり閉じたりする前にクリップボードにコピーしてメモ帳等で保存してください。</p>
+        </div>
         <textarea class='form-field' id='target-csv' rows='10' cols='40'
           placeholder='監視対象1台ごとに1行で「<ホスト名・IPアドレス>[,<コメント>]」を記述してください（コメントはなくてもOK）。
           &#13;&#10;例：&#13;&#10;192.168.0.1,山田太郎さん操作&#13;&#10;Host10,予備マシン'></textarea>
