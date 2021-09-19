@@ -24,15 +24,15 @@
         <h1>監視対象画面一覧</h1>
       </div>
       <div class="buttons">
-        <button id='button-start-watching' class='form-field is-danger' @click='startWatching'>監視開始</button>
-        <button id='button-stop-watching' class='form-field' @click='stopWatching'>監視停止</button>
+        <button id='button-start-watching' class='form-field is-danger' v-bind:disabled="isAutoRefresh" @click='isAutoRefresh = true'>監視開始</button>
+        <button id='button-stop-watching' class='form-field' @click='isAutoRefresh = false'>監視停止</button>
         <button class='form-field' @click='toggleConfigurationVisibility'>設定画面表示・非表示</button>
       </div>
     </div>
     <div id='configuration-panel' class='configuration' :class='{"is-expanded": showConfiguration, "is-shurinked": !showConfiguration}'>
       <h2>設定</h2>
       <p>画像サイズとアスペクト比はすべての画面での共通設定です。異なるアスペクト比の画面では画面下部が見えなくなる可能性があります。
-        ポート番号は変更後Enterキーですぐ反映されます。更新間隔は一度監視を停止して再度開始する際に反映されます。</p>
+        ポート番号は変更後Enterキーですぐ反映されます。更新間隔を自動監視中に変更すると監視が止まります。再度手動での監視開始が必要です。</p>
       <div id='general-configuration'>
         <div id='zoom-in-zoom-out'>
           <label for='image-width'>画像サイズ:
@@ -71,13 +71,13 @@
         </label>
         <!-- ポート番号は編集中に毎回反映されると大変なので、Enterで確定したらにする。 -->
         <label for='port-number'>ポート番号:
-          <input class='form-field' type='number' id='port-number' min='1' max='65535' ref='portNumber' v-bind:value='portNumber' v-on:keyup.enter='applyPortNumber'>
+          <input class='form-field' type='text' id='port-number' ref='portNumber' maxlength='6' pattern='[0-9]{1,5}' v-bind:value='portNumber' v-on:keyup.enter='applyPortNumber'>
         </label>
       </div>
       <div id='target-configuration'>
         <label for='target-csv'>監視対象指定リスト<a href='list-help.html' target='_blank'>（指定リストのヘルプ）</a>:        </label>
         <textarea class='form-field' id='target-csv' rows='10' cols='40'
-          placeholder='監視対象1台ごとに1行で「<ホスト名・IPアドレス>,<コメント>」を記述してください。
+          placeholder='監視対象1台ごとに1行で「<ホスト名・IPアドレス>[,<コメント>]」を記述してください（コメントはなくてもOK）。
           &#13;&#10;例：&#13;&#10;192.168.0.1,山田太郎さん操作&#13;&#10;Host10,予備マシン'></textarea>
         <button class='form-field' name='apply-targets' id='apply-targets' @click='applyTargetCsv'>リスト反映</button>
       </div>

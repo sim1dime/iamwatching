@@ -11,6 +11,7 @@ const Watcher = {
           portNumber: 3400,         // 各監視対象と通信するポート番号
           targets: [],              // 監視対象画面一覧の各画面に必要な情報の配列
           intervalId: -1,           // 監視画面の更新をsetInterval()で行う際に生成されるID（停止に必要）
+          isAutoRefresh: false,     // 自動監視での更新を行うかどうか
           showConfiguration: true   // 設定画面を表示するかどうか。trueで表示する。
       }
   },
@@ -43,34 +44,6 @@ const Watcher = {
             this.targets[i].count = now;
         }
     },
-    // startWatching は各監視画面を取得・更新する繰り返し処理を開始します。
-    startWatching(event) {
-        // インターバルについてチェックしないとSetInterval()の動作がやばいのでチェックする。
-        // 更新間隔の秒数であるため、数値のみかつ1～300の範囲のみとし、条件に合わない場合は5にリセットする。
-        if (/^\d+$/.test(this.refreshInterval) == false) {
-            this.refreshInterval = 5;
-        }
-        let interval = Number(this.refreshInterval);
-        if (interval < 1 || interval > 300) {
-            this.refreshInterval = 5;
-            interval = 5;
-        }
-        // 繰り返しそのものはsetInterval()で行わせるため、全監視画面更新メソッドを登録して終わり。
-        this.intervalId = setInterval(this.refreshAllScreenImage, interval * 1000);
-        // 多重に繰り返し処理を行わないよう、開始ボタンを無効化する。
-        window.document.querySelector('#button-start-watching').disabled = true;
-    },
-    // stopWatching は各監視画面を取得・更新する繰り返し処理を停止します。
-    stopWatching(event) {
-        // setInterval()が返す「0ではない正の整数」かどうか確認する。もし違ったら何もしないで終わる。
-        if (this.intervalId > 0) {
-            clearInterval(this.intervalId);
-            // 連続してクリックしてしまった場合などの対策として0にしておく。
-            this.intervalId = 0;
-            // crearIntervalで監視処理を止めたので、監視開始ボタンをクリックできるようにする。
-            window.document.querySelector('#button-start-watching').disabled = false;
-        }
-    },    
     // 設定画面の表示・非表示切り替えを行います。
     toggleConfigurationVisibility() {
         this.showConfiguration = !this.showConfiguration;
@@ -203,6 +176,39 @@ const Watcher = {
           });
           // 最後に一括差し替え
           this.targets = newTargets;   
+      },
+      // 自動監視のON/OFF（isAutoRefreshのtrue/false）が変わった場合、setInterval()による自動監視の実行・停止を追従させる
+      isAutoRefresh(newIsAutoRefresh, oldIsAutoRefresh) {
+        if (newIsAutoRefresh) {
+            // インターバルについてチェックしないとSetInterval()の動作がやばいのでチェックする。
+            // 更新間隔の秒数であるため、数値のみかつ1～300の範囲のみとし、条件に合わない場合は5にリセットする。
+            if (/^\d+$/.test(this.refreshInterval) == false) {
+                this.refreshInterval = 5;
+            }
+            let interval = Number(this.refreshInterval);
+            if (interval < 1 || interval > 300) {
+                this.refreshInterval = 5;
+                interval = 5;
+            }
+            // 繰り返しそのものはsetInterval()で行わせるため、全監視画面更新メソッドを登録して終わり。
+            this.intervalId = setInterval(this.refreshAllScreenImage, interval * 1000);
+            // [監視開始]ボタンの有効・無効はisAutoReresh変数にバインドしているのでここでは操作しない
+    
+        }
+        else if (this.intervalId > 0) {
+            // newIsAutoRefresh == falseつまり停止指示で、
+            // またthis.intervalId > 0つまりすでにsetInterval()で自動監視されている場合止める。
+            clearInterval(this.intervalId);
+            // 連続してクリックしてしまった場合などの対策として0にしておく。
+            this.intervalId = 0;
+            // [監視開始]ボタンの有効・無効はisAutoReresh変数にバインドしているのでここでは操作しない
+        }
+      },
+      refreshInterval(newRefreshInterval, oldRefreshInterval) {
+        // 自動更新中に間隔が変更された場合、自動更新を止める。
+        if (this.isAutoRefresh) {
+            this.isAutoRefresh = false;
+        }
       }
   },
   mounted: function() {

@@ -124,6 +124,9 @@ label {
 #zoom-in-zoom-out {
     display: flex;
 }
+#port-number {
+    width: 6em;
+}
 /* ---- 監視対象リスト設定 ---- */
 #target-configuration {
     display: flex;
