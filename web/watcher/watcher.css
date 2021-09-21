@@ -124,12 +124,21 @@ label {
 #zoom-in-zoom-out {
     display: flex;
 }
+#port-number {
+    width: 6em;
+}
 /* ---- 監視対象リスト設定 ---- */
 #target-configuration {
     display: flex;
     padding-top: 0.5em;
     column-gap: 1em;
     border-top: solid 1px mediumslateblue;
+}
+#target-configuration :first-child {
+    max-width: 40%;
+}
+#target-configuration p {
+    margin-left: 16px;
 }
 #target-configuration label {
     align-self: flex-start;
