@@ -100,7 +100,7 @@ const Watcher = {
     getParameterFromFragment(fragment) {
         // match()はグローバルフラグ（g）のない正規表現で一致全体とキャプチャグループをArrayで返す。
         const matches = fragment.match(/^#single-(\d+)-(\d+)-(.+)$/);
-        console.log(matches);
+        // console.log(matches);
         // うまくとれていれば、元文字列、更新間隔、ポート番号、ホストで長さ4配列。
         if (matches.length != 4) {
             return null;
@@ -110,7 +110,7 @@ const Watcher = {
                portNumber: matches[2],
                interval: matches[1]
         };
-        console.log(param);
+        // console.log(param);
         return param;
     },
     // 監視対象画面を1段階拡大または縮小する
@@ -308,7 +308,7 @@ app.component('target-screen', {
         newScreenImageSize() {
             // target-screenで定義しているCSS変数を上書きすることで内部の要素をまとめてサイズ変更する
             // このため、target-screenテンプレートのCSSでは必ず --screen-width 変数を定義しておくこと。
-            console.log(this.width + "x" + this.height);
+            // console.log(this.width + "x" + this.height);
             return ("--screen-width: " + this.width + "px; --screen-height: " + this.height + "px;");
         },
         // 自動更新のためのカウントを追加したURLの作成
