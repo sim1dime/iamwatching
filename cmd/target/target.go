@@ -30,7 +30,7 @@ func getScreenJPEG(w http.ResponseWriter, r *http.Request) {
 		width = 0
 	}
 	// パラメーターチェックが終わったので0番目のキャプチャ画像を取得
-	img, err := getScreenZero(width)
+	img, err := getScreen(0, width)
 	if err != nil {
 		// 画像取得でエラーがあった場合は503を返す。
 		// たとえばEC2 WindowsインスタンスにRDP接続していないときはscreenshot.CaptureRect()でBitBltが失敗してここにくる
@@ -53,12 +53,6 @@ func getScreenPNG(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 	png.Encode(w, img)
-}
-
-// getScreen()はディスプレイ番号0番の画面全体をキャプチャして、画像を返します。
-func getScreenZero(width int) (img *image.RGBA, err error) {
-	img, err = getScreen(0, width)
-	return
 }
 
 // getScreen()は指定されたディスプレイ番号の画面全体をキャプチャして、画像を返します。
@@ -118,6 +112,11 @@ func getHostname(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "%s", hostname)
 }
 
+// getPanic は動作確認目的で強制的にpanic()します。
+func getPanic(w http.ResponseWriter, r *http.Request) {
+	panic("getPanic is called.")
+}
+
 func main() {
 	// ポート番号を実行時引数で受け取る。デフォルトは3400。
 	port := flag.Int("port", 3400, "監視側サーバーからの通信を待ち受けるポート番号です。")
@@ -133,5 +132,6 @@ func main() {
 	http.HandleFunc("/screenpng", getScreenPNG)
 	http.HandleFunc("/screenjpeg", getScreenJPEG)
 	http.HandleFunc("/hostname", getHostname)
+	http.HandleFunc("/panic" getPanic)
 	log.Fatal(http.ListenAndServe(portString, nil))
 }
