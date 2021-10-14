@@ -34,7 +34,7 @@ func getScreenJPEG(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		// 画像取得でエラーがあった場合は503を返す。
 		// たとえばEC2 WindowsインスタンスにRDP接続していないときはscreenshot.CaptureRect()でBitBltが失敗してここにくる
-		log.Printf("Error occured in screen capture: %s", err)
+		log.Printf("getScreenJPEG: Error occured in screen capture: %s", err)
 		w.WriteHeader(http.StatusServiceUnavailable)
 		// panic(err)
 		return
@@ -47,10 +47,15 @@ func getScreenJPEG(w http.ResponseWriter, r *http.Request) {
 
 // getScreenPNG は0番ディスプレイのキャプチャ画像をPNGでHTTPクライアントに返します。
 func getScreenPNG(w http.ResponseWriter, r *http.Request) {
-	// 当初転送時の画質とファイルサイズ比較用に用意しただけなのでシンプルに取得して終わり
-	img, err := getScreenZero(0)
+	// クエリパラメーターでwidthが許容範囲内で指定されていたら、縮小（拡大も？）する。
+	// 未指定または許容範囲外の時はgetScreen()に0を渡すようにして原寸として処理する。
+	width, err := strconv.Atoi(r.FormValue("width"))
 	if err != nil {
-		panic(err)
+		width = 0
+	}
+	img, err := getScreen(0, width)
+	if err != nil {
+		log.Printf("getScreenPNG: Error occured in screen capture: %s", err)
 	}
 	png.Encode(w, img)
 }
@@ -118,13 +123,13 @@ func getPanic(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+
 	// ポート番号を実行時引数で受け取る。デフォルトは3400。
 	port := flag.Int("port", 3400, "監視側サーバーからの通信を待ち受けるポート番号です。")
 	flag.Parse()
 	// 負値や65535より大きい値を指定していないかチェック
 	if *port < 0 || *port > 65535 {
-		fmt.Println("ポート番号は0～65535の間で指定してください。本プログラムを終了します。")
-		os.Exit(1)
+		log.Fatalln("ポート番号は0～65535の間で指定してください。本プログラムを終了します。")
 	}
 	portString := fmt.Sprintf(":%d", *port)
 
@@ -132,6 +137,6 @@ func main() {
 	http.HandleFunc("/screenpng", getScreenPNG)
 	http.HandleFunc("/screenjpeg", getScreenJPEG)
 	http.HandleFunc("/hostname", getHostname)
-	http.HandleFunc("/panic" getPanic)
+	http.HandleFunc("/panic", getPanic)
 	log.Fatal(http.ListenAndServe(portString, nil))
 }
